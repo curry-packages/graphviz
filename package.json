@@ -1,0 +1,19 @@
+{
+    "name": "graphviz",
+    "version": "1.0.0",
+    "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
+    "synopsis": "Libraries to visualize graphs with Graphviz",
+    "category": [ "Data", "User Interface" ],
+    "dependencies": { },
+    "exportedModules": [ "ShowDotGraph" ],
+    "compilerCompatibility": {
+        "pakcs": ">= 1.14.0, < 2.0.0",
+        "kics2": ">= 0.5.0,  < 2.0.0"
+    },
+    "license": "BSD-3-Clause",
+    "licenseFile": "LICENSE",
+    "source": {
+        "git": "https://git.ps.informatik.uni-kiel.de/curry-packages/graphviz.git",
+        "tag": "$version"
+    }
+}
