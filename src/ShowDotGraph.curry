@@ -1,15 +1,16 @@
--- Simple graph visualization
+--- A library for graph visualization with [Graphviz](http://www.graphviz.org/).
+
 module ShowDotGraph
   ( DotGraph(..), Node(..), Edge(..)
   , viewDotGraph, getDotViewCmd, setDotViewCmd )
  where
 
+import Char         (isAlphaNum)
+import Distribution (rcFileName,getRcVar)
 import IO
 import IOExts
-import Char(isAlphaNum)
-import List(intercalate)
-import Distribution(rcFileName,getRcVar)
-import PropertyFile(updatePropertyFile)
+import List         (intercalate)
+import PropertyFile (updatePropertyFile)
 
 --- A Dot graph consists of a name and a list of nodes and edges.
 data DotGraph = Graph String [Node] [Edge]
@@ -30,27 +31,11 @@ data Edge = Edge String String [(String,String)]
 viewDotGraph :: DotGraph -> IO ()
 viewDotGraph = viewDot . showDotGraph
 
--- translate dependencies into DOT language:
-deps2dot :: [(String,[(String,String)],[String])] -> String
-deps2dot deps =
-  "digraph dependencies{\n" ++ concatMap dep2dot deps ++ "}\n"
- where
-  dep2dot (x,attrs,xdeps) =
-    let attrtxt = if null attrs then ""
-                  else showDotID x ++
-                       '[' : intercalate ","
-                                (map (\ (n,v)->n++"=\""++v++"\"") attrs) ++ "]"
-                        ++ ";\n"  in
-    if null xdeps
-      then if null attrs then showDotID x ++ ";\n" else attrtxt
-      else concatMap (\i->showDotID x ++ " -> " ++ showDotID i ++ ";\n") xdeps
-           ++ attrtxt
-
 --- Shows a Dot graph as a string of the DOT language.
 showDotGraph :: DotGraph -> String
 showDotGraph (Graph name nodes edges) =
-  "digraph "++name++"{\n" ++
-  concatMap node2dot nodes ++ concatMap edge2dot edges ++ "}\n"
+  "digraph \"" ++ name ++ "\"" ++
+  "{\n" ++ concatMap node2dot nodes ++ concatMap edge2dot edges ++ "}\n"
  where
   node2dot (Node nname attrs) =
     if null attrs
