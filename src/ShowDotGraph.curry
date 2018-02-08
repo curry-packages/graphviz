@@ -2,7 +2,7 @@
 
 module ShowDotGraph
   ( DotGraph(..), Node(..), Edge(..)
-  , viewDotGraph, getDotViewCmd, setDotViewCmd )
+  , viewDotGraph, showDotGraph, getDotViewCmd, setDotViewCmd )
  where
 
 import Char         (isAlphaNum)
