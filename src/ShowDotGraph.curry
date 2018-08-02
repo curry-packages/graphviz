@@ -5,11 +5,11 @@ module ShowDotGraph
   , viewDotGraph, showDotGraph, getDotViewCmd, setDotViewCmd )
  where
 
-import Char         (isAlphaNum)
+import Data.Char    (isAlphaNum)
 import Distribution (rcFileName,getRcVar)
-import IO
+import System.IO
 import IOExts
-import List         (intercalate)
+import Data.List    (intercalate)
 import PropertyFile (updatePropertyFile)
 
 --- A Dot graph consists of a name and a list of nodes and edges.
