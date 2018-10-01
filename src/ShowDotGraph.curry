@@ -5,12 +5,12 @@ module ShowDotGraph
   , viewDotGraph, showDotGraph, getDotViewCmd, setDotViewCmd )
  where
 
-import Char         (isAlphaNum)
-import Distribution (rcFileName,getRcVar)
+import Char         ( isAlphaNum )
+import Distribution ( rcFileName, getRcVar )
 import IO
 import IOExts
-import List         (intercalate)
-import PropertyFile (updatePropertyFile)
+import List         ( intercalate, last )
+import PropertyFile ( updatePropertyFile )
 
 --- A Dot graph consists of a name and a list of nodes and edges.
 data DotGraph = Graph String [Node] [Edge]
@@ -38,19 +38,25 @@ showDotGraph (Graph name nodes edges) =
   "{\n" ++ concatMap node2dot nodes ++ concatMap edge2dot edges ++ "}\n"
  where
   node2dot (Node nname attrs) =
-    if null attrs
-    then showDotID nname ++ ";\n"
-    else showDotID nname ++
-            '[' : intercalate ","
-                              (map (\ (n,v)->n++"=\""++v++"\"") attrs) ++ "]"
-                  ++ ";\n"
+    showDotID nname ++ showDotAttrs attrs ++ ";\n"
 
   edge2dot (Edge i j attrs) =
-    showDotID i ++ " -> " ++ showDotID j ++
-    (if null attrs then "" else
-       '[' : intercalate ","
-                         (map (\ (n,v)->n++"=\""++v++"\"") attrs) ++ "]")
-    ++ ";\n"
+    showDotID i ++ " -> " ++ showDotID j ++ showDotAttrs attrs ++ ";\n"
+
+  showDotAttrs attrs =
+    if null attrs then ""
+                  else '[' : intercalate "," (map showDotAttr attrs) ++ "]"
+
+--- Shows an attribute of a graph as a string of the DOT language.
+--- If the attribute name is `label` and its value is enclosed in
+--- angle brackets, it is shown as an HTML-like label, otherwise it is
+--- enclosed in quotation marks.
+showDotAttr :: (String,String) -> String
+showDotAttr (name,value)
+ | name == "label" && not (null value) && head value == '<' && last value == '>'
+ = "label=" ++ value
+ | otherwise
+ = name ++ "=\"" ++ value ++ "\""
 
 showDotID :: String -> String
 showDotID s | all isAlphaNum s = s
