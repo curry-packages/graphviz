@@ -4,7 +4,9 @@
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
     "synopsis": "Libraries to visualize graphs with Graphviz",
     "category": [ "Data", "User Interface" ],
-    "dependencies": { },
+    "dependencies": { 
+        "base" : ">= 2.0.0"
+    },
     "exportedModules": [ "ShowDotGraph" ],
     "compilerCompatibility": {
         "pakcs": ">= 2.0.0",

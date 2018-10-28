@@ -1,7 +1,16 @@
---- A library for graph visualization with [Graphviz](http://www.graphviz.org/).
+--------------------------------------------------------------------------
+--- A simple library for graph visualization with
+--- [Graphviz](http://www.graphviz.org/).
+--- It provides a data structure to represent graphs and operations
+--- to visualize them.
+---
+--- @author Michael Hanus
+--- @version October 2018
+--------------------------------------------------------------------------
+
 
 module ShowDotGraph
-  ( DotGraph(..), Node(..), Edge(..)
+  ( DotGraph, dgraph, ugraph, Node(..), Edge(..)
   , viewDotGraph, showDotGraph, getDotViewCmd, setDotViewCmd )
  where
 
@@ -9,11 +18,24 @@ import Data.Char    (isAlphaNum)
 import Distribution (rcFileName,getRcVar)
 import System.IO
 import IOExts
-import Data.List    (intercalate)
+import Data.List    (intercalate, last)
 import PropertyFile (updatePropertyFile)
 
+--------------------------------------------------------------------------
+-- Data types for graphs.
+
 --- A Dot graph consists of a name and a list of nodes and edges.
-data DotGraph = Graph String [Node] [Edge]
+--- It can be either directed (`Graph`) or undirected (`UGraph`).
+data DotGraph = DGraph String [Node] [Edge]
+              | UGraph String [Node] [Edge]
+
+--- Constructs a directed graph from a name and a list of nodes and edges.
+dgraph :: String -> [Node] -> [Edge] -> DotGraph
+dgraph name nodes edges = DGraph name nodes edges
+
+--- Constructs an undirected graph from a name and a list of nodes and edges.
+ugraph :: String -> [Node] -> [Edge] -> DotGraph
+ugraph name nodes edges = UGraph name nodes edges
 
 --- A node of a dot graph consists of a name and a list of attributes
 --- for this node.
@@ -23,6 +45,7 @@ data Node = Node String [(String,String)]
 --- and a list of attributes for this edge.
 data Edge = Edge String String [(String,String)]
 
+--------------------------------------------------------------------------
 --- Visualize a DOT graph with the `dotviewcommand` specified in
 --- the rc file of the Curry system.
 -- A dependency graph consists of a list of triples of the form (n,as,ms),
@@ -33,24 +56,41 @@ viewDotGraph = viewDot . showDotGraph
 
 --- Shows a Dot graph as a string of the DOT language.
 showDotGraph :: DotGraph -> String
-showDotGraph (Graph name nodes edges) =
-  "digraph \"" ++ name ++ "\"" ++
-  "{\n" ++ concatMap node2dot nodes ++ concatMap edge2dot edges ++ "}\n"
- where
-  node2dot (Node nname attrs) =
-    if null attrs
-    then showDotID nname ++ ";\n"
-    else showDotID nname ++
-            '[' : intercalate ","
-                              (map (\ (n,v)->n++"=\""++v++"\"") attrs) ++ "]"
-                  ++ ";\n"
+showDotGraph (DGraph name nodes edges) =
+  "digraph \"" ++ name ++ "\"" ++ graphbody2dot True nodes edges
+showDotGraph (UGraph name nodes edges) =
+  "graph \"" ++ name ++ "\"" ++ graphbody2dot False nodes edges
 
-  edge2dot (Edge i j attrs) =
-    showDotID i ++ " -> " ++ showDotID j ++
-    (if null attrs then "" else
-       '[' : intercalate ","
-                         (map (\ (n,v)->n++"=\""++v++"\"") attrs) ++ "]")
-    ++ ";\n"
+graphbody2dot :: Bool -> [Node] -> [Edge] -> String
+graphbody2dot directed nodes edges =
+  "{\n" ++ concatMap node2dot nodes ++
+           concatMap (edge2dot directed) edges ++ "}\n"
+
+node2dot :: Node -> String
+node2dot (Node nname attrs) =
+  showDotID nname ++ showDotAttrs attrs ++ ";\n"
+
+edge2dot :: Bool -> Edge -> String
+edge2dot directed (Edge i j attrs) =
+  showDotID i ++ edgeOp ++ showDotID j ++ showDotAttrs attrs ++ ";\n"
+ where
+  edgeOp = if directed then " -> " else " -- "
+
+showDotAttrs :: [(String, String)] -> String
+showDotAttrs attrs =
+  if null attrs then ""
+                else '[' : intercalate "," (map showDotAttr attrs) ++ "]"
+
+--- Shows an attribute of a graph as a string of the DOT language.
+--- If the attribute name is `label` and its value is enclosed in
+--- angle brackets, it is shown as an HTML-like label, otherwise it is
+--- enclosed in quotation marks.
+showDotAttr :: (String,String) -> String
+showDotAttr (name,value)
+ | name == "label" && not (null value) && head value == '<' && last value == '>'
+ = "label=" ++ value
+ | otherwise
+ = name ++ "=\"" ++ value ++ "\""
 
 showDotID :: String -> String
 showDotID s | all isAlphaNum s = s
