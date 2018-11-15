@@ -5,7 +5,7 @@
 --- to visualize them.
 ---
 --- @author Michael Hanus
---- @version October 2018
+--- @version November 2018
 --------------------------------------------------------------------------
 
 
@@ -25,7 +25,7 @@ import PropertyFile ( updatePropertyFile )
 -- Data types for graphs.
 
 --- A Dot graph consists of a name and a list of nodes and edges.
---- It can be either directed (`Graph`) or undirected (`UGraph`).
+--- It can be either directed (`DGraph`) or undirected (`UGraph`).
 data DotGraph = DGraph String [Node] [Edge]
               | UGraph String [Node] [Edge]
 
