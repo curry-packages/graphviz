@@ -5,7 +5,7 @@
 --- to visualize them.
 ---
 --- @author Michael Hanus
---- @version November 2018
+--- @version December 2018
 --------------------------------------------------------------------------
 
 
@@ -15,11 +15,12 @@ module ShowDotGraph
  where
 
 import Char         ( isAlphaNum )
-import Distribution ( rcFileName, getRcVar )
+import Distribution ( rcFileName )
 import IO
 import IOExts
 import List         ( intercalate, last )
-import PropertyFile ( updatePropertyFile )
+
+import Data.PropertyFile ( getPropertyFromFile, updatePropertyFile )
 
 --------------------------------------------------------------------------
 -- Data types for graphs.
@@ -111,7 +112,9 @@ viewDot dottxt = do
 --- Read the command for viewing dot files from the rc file of the
 --- Curry system.
 getDotViewCmd :: IO String
-getDotViewCmd = getRcVar "dotviewcommand" >>= return . maybe "" id
+getDotViewCmd = do
+  rcfile <- rcFileName
+  getPropertyFromFile rcfile "dotviewcommand" >>= return . maybe "" id
 
 --- Sets the command for viewing dot files in the rc file of the
 --- Curry system.
