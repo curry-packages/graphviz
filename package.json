@@ -1,18 +1,16 @@
 {
     "name": "graphviz",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
     "synopsis": "Libraries to visualize graphs with Graphviz",
     "category": [ "Data", "User Interface" ],
     "dependencies": {
-        "base"         : ">= 1.0.0, < 2.0.0",
-        "propertyfile" : ">= 0.0.1"
+        "base"         : ">= 3.0.0, < 4.0.0",
+        "currypath"    : ">= 3.0.0, < 4.0.0",
+        "io-extra"     : ">= 3.0.0, < 4.0.0",
+        "propertyfile" : ">= 3.0.0, < 4.0.0"
     },
     "exportedModules": [ "ShowDotGraph" ],
-    "compilerCompatibility": {
-        "pakcs": ">= 2.0.0",
-        "kics2": ">= 2.0.0"
-    },
     "license": "BSD-3-Clause",
     "licenseFile": "LICENSE",
     "source": {

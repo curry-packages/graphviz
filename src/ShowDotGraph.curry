@@ -5,7 +5,7 @@
 --- to visualize them.
 ---
 --- @author Michael Hanus
---- @version December 2018
+--- @version November 2020
 --------------------------------------------------------------------------
 
 
@@ -14,13 +14,12 @@ module ShowDotGraph
   , viewDotGraph, showDotGraph, getDotViewCmd, setDotViewCmd )
  where
 
-import Char         ( isAlphaNum )
-import Distribution ( rcFileName )
-import IO
-import IOExts
-import List         ( intercalate, last )
+import Data.List         ( intercalate, last )
+import System.IO         ( hClose, hPutStr )
 
 import Data.PropertyFile ( getPropertyFromFile, updatePropertyFile )
+import System.CurryPath  ( curryrcFileName )
+import System.IOExts     ( connectToCommand )
 
 --------------------------------------------------------------------------
 -- Data types for graphs.
@@ -113,14 +112,14 @@ viewDot dottxt = do
 --- Curry system.
 getDotViewCmd :: IO String
 getDotViewCmd = do
-  rcfile <- rcFileName
+  rcfile <- curryrcFileName
   getPropertyFromFile rcfile "dotviewcommand" >>= return . maybe "" id
 
 --- Sets the command for viewing dot files in the rc file of the
 --- Curry system.
 setDotViewCmd :: String -> IO ()
 setDotViewCmd dvcmd = do
-  rcfile <- rcFileName
+  rcfile <- curryrcFileName
   updatePropertyFile rcfile "dotviewcommand" dvcmd
 
 -------------------------------------------------------------------------
