@@ -21,7 +21,8 @@
 
 module Data.GraphViz
   ( DotGraph, dgraph, ugraph, Node(..), Edge(..)
-  , viewDotGraph, showDotGraph, getDotViewCmd, setDotViewCmd )
+  , viewDotGraph, showDotGraph, showDotGraphWithAttrs
+  , getDotViewCmd, setDotViewCmd )
  where
 
 import Data.List         ( intercalate, last )
@@ -63,15 +64,22 @@ viewDotGraph = viewDot . showDotGraph
 
 --- Shows a Dot graph as a string of the DOT language.
 showDotGraph :: DotGraph -> String
-showDotGraph (DGraph name nodes edges) =
-  "digraph \"" ++ name ++ "\"" ++ graphbody2dot True nodes edges
-showDotGraph (UGraph name nodes edges) =
-  "graph \"" ++ name ++ "\"" ++ graphbody2dot False nodes edges
+showDotGraph g = showDotGraphWithAttrs "" g
 
-graphbody2dot :: Bool -> [Node] -> [Edge] -> String
-graphbody2dot directed nodes edges =
-  "{\n" ++ concatMap node2dot nodes ++
-           concatMap (edge2dot directed) edges ++ "}\n"
+--- Shows a Dot graph as a string of the DOT language.
+--- The second argument contains a string of graph attributes
+--- of the DOT languages, e.g., `ordering=out;'.
+showDotGraphWithAttrs :: String -> DotGraph -> String
+showDotGraphWithAttrs attrs (DGraph name nodes edges) =
+  "digraph \"" ++ name ++ "\"" ++ graphbody2dot True attrs nodes edges
+showDotGraphWithAttrs attrs (UGraph name nodes edges) =
+  "graph \"" ++ name ++ "\"" ++ graphbody2dot False attrs nodes edges
+
+graphbody2dot :: Bool -> String -> [Node] -> [Edge] -> String
+graphbody2dot directed attrs nodes edges =
+  "{\n" ++ (if null attrs then "" else attrs ++ "\n")
+        ++ concatMap node2dot nodes
+        ++ concatMap (edge2dot directed) edges ++ "}\n"
 
 node2dot :: Node -> String
 node2dot (Node nname attrs) =
