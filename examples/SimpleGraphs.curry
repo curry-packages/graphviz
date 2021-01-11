@@ -1,4 +1,4 @@
-import ShowDotGraph
+import Data.GraphViz
 
 -- A simple undirected graph without attributes.
 graph1 :: DotGraph
